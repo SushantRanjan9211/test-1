@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9ae9ea7a-3b95-47c3-8fea-b227188e36ca" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="742f0d1e-a50b-400c-b350-30b433038a78" file="${env}-config.yaml" />
+	<global-property doc:name="Global Property" doc:id="72cc47cc-24fc-4ec9-a62f-b0f04ba16dce" name="env" value="dev" />
+	<flow name="test-1Flow" doc:id="d5a1cd2e-f3d9-4125-9dab-eaac1cb37dfd" >
+		<http:listener doc:name="Listener" doc:id="15a79d04-640a-4bf9-8dae-c44774731102" config-ref="HTTP_Listener_config" path="/test1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bfdd2e0d-48b7-4636-afd6-d4e289e9d3ca" message="Starting Test 1"/>
+		<ee:transform doc:name="Transform Message" doc:id="a263bff9-632a-40cf-aa7f-42dc6c65df4c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"empID" : 123,
+	"empName" : "ABC"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c38c0ba4-b3d2-464b-887f-93dd19909f86" message="Ending Test 1"/>
+		<vm:publish queueName="test" doc:name="Publish" doc:id="f0c19298-33e0-499d-9c63-32bd79afa6ed" config-ref="VM_Config"/>
+	</flow>
+</mule>
